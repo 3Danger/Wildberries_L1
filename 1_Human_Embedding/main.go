@@ -38,7 +38,7 @@ func example1() {
 	ac = Action{Human{"Biba"}, "someValue"}                   // way 1
 	ac = Action{Human: Human{"Biba"}, someField: "someValue"} // way 2
 
-	// У объекта Action можно неявно вызвать метод принадлежащий Human/ SayHello()
+	// У объекта Action можно неявно вызвать метод принадлежащий Human SayHello()
 	ac.SayHello()
 	// Так же можно явно вызвать этот метод
 	ac.Human.SayHello()
