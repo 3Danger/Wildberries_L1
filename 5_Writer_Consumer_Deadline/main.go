@@ -25,10 +25,12 @@ func InputScanTime() (tm time.Duration) {
 
 func main() {
 	tm := InputScanTime()
+
 	ctxTimeout, cancelFuncTm := context.WithTimeout(context.Background(), tm)
 	defer cancelFuncTm()
 	ctxClosable, cancelFunc := context.WithCancel(context.Background())
 	defer cancelFunc()
+
 	ch := make(chan int)
 	go Receiver(ctxClosable, ch)
 	Sender(ctxTimeout, cancelFunc, ch)
