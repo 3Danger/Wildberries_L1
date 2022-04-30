@@ -15,8 +15,30 @@ import (
 
 func main() {
 	array := []int{2, 4, 6, 8, 10}
+	SolutionMutex(array)
 	SolutionChannel(array)
 	SolutionWaitGroup(array)
+}
+
+func SolutionMutex(nums []int) {
+	mut := sync.RWMutex{}
+	size := len(nums)
+	waitChan := make(chan struct{}, size)
+	fmt.Println("SolutionMutex")
+
+	for _, v := range nums {
+		go func(n int, m *sync.RWMutex) {
+			m.Lock()
+			fmt.Println(n * n)
+			m.Unlock()
+			waitChan <- struct{}{}
+		}(v, &mut)
+	}
+	for size > 0 {
+		<-waitChan
+		size--
+	}
+	close(waitChan)
 }
 
 func SolutionChannel(array []int) {

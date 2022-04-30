@@ -16,9 +16,32 @@ import (
 
 func main() {
 	array := []int{2, 4, 6, 8, 10}
+	SolutionMutex(array)
 	SolutionChannel(array)
 	SolutionWaitGroup(array)
 	SolutionAtomic(array)
+}
+
+func SolutionMutex(nums []int) {
+	var sum int
+	mut := sync.Mutex{}
+	size := len(nums)
+	waitChan := make(chan struct{})
+	fmt.Println("SolutionMutex")
+	for _, v := range nums {
+		go func(n int, m *sync.Mutex) {
+			m.Lock()
+			sum += n * n
+			m.Unlock()
+			waitChan <- struct{}{}
+		}(v, &mut)
+	}
+	for size > 0 {
+		<-waitChan
+		size--
+	}
+	close(waitChan)
+	fmt.Println("sum :=", sum)
 }
 
 func SolutionChannel(array []int) {
