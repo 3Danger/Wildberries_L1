@@ -46,5 +46,4 @@ func main() {
 	pByte1 := NewPoint[byte](50, 14)
 	pByte2 := NewPoint[byte](28, 12)
 	fmt.Println(pByte1.Distance(pByte2))
-
 }
