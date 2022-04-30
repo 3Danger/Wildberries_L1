@@ -1,10 +1,8 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"sync"
-	"time"
 )
 
 /*
@@ -14,35 +12,38 @@ import (
 */
 
 type CounterStruct struct {
-	sync.Mutex
 	sync.WaitGroup
+	sync.Mutex
 	Count int
 }
 
-func main() {
-	const NWorkers = 10
-	counter := CounterStruct{sync.Mutex{}, sync.WaitGroup{}, 0}
+func (c *CounterStruct) Increment() {
+	c.Lock()
+	// Критическая секция к которой
+	// доступ в один момент времени
+	// должен быть только у одного потока
+	c.Count++
+	c.Unlock()
+}
 
-	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second)
-	defer cancelFunc()
-	counter.Add(NWorkers)
-	for i := 0; i < NWorkers; i++ {
-		go CompetitiveFunc(ctx, &counter)
+func GoroutineOne(counterStruct *CounterStruct) {
+	// Инкрементируем
+	counterStruct.Increment()
+	// Отмечаемся что завершили работу
+	counterStruct.Done()
+}
+
+func usingMutex(n int) {
+	counter := &CounterStruct{sync.WaitGroup{}, sync.Mutex{}, 0}
+	counter.Add(n)
+	for i := 0; i < n; i++ {
+		go GoroutineOne(counter)
 	}
 	counter.Wait()
 	fmt.Println("counted:", counter.Count)
+
 }
 
-func CompetitiveFunc(ctx context.Context, c *CounterStruct) {
-	for {
-		select {
-		case <-ctx.Done():
-			c.Done()
-			return
-		default:
-			c.Lock()
-			c.Count++
-			c.Unlock()
-		}
-	}
+func main() {
+	usingMutex(1000000)
 }
