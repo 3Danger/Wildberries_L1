@@ -39,12 +39,16 @@ func RemoveWithResize[T any](arr []T, n int) ([]T, error) {
 	if ok != nil {
 		return arr, ok
 	}
+	return Resize(arr), nil
+}
+
+func Resize[T any](arr []T) []T {
 	l := float32(len(arr))
 	c := float32(cap(arr))
 	if c/l > 1.333 {
 		arr2 := make([]T, int(l))
 		copy(arr2, arr)
-		return arr2, nil
+		return arr2
 	}
-	return arr, nil
+	return arr
 }
