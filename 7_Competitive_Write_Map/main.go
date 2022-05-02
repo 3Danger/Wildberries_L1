@@ -10,13 +10,13 @@ import (
 */
 
 type MapMutex struct {
-	sync.RWMutex
+	sync.Mutex
 	data map[int]int
 }
 
 func main() {
 	const COUNT = 1000
-	dataMap := &MapMutex{sync.RWMutex{}, make(map[int]int)}
+	dataMap := &MapMutex{sync.Mutex{}, make(map[int]int)}
 	group := sync.WaitGroup{}
 	group.Add(COUNT)
 
@@ -29,18 +29,13 @@ func main() {
 			group.Done()
 		}(i)
 	}
-	group.Wait()
-	group.Add(COUNT)
 
-	// Конкурентное чтение
-	for i := 0; i < COUNT; i++ {
-		go func(v int) {
-			dataMap.RLock()
-			fmt.Printf("key %d\tval %d\n", v, dataMap.data[v])
-			dataMap.RUnlock()
-			group.Done()
-		}(i)
-	}
+	//Ждем завершения всех потоков
 	group.Wait()
-	fmt.Println("len", len(dataMap.data))
+
+	// Чтение
+	for k, v := range dataMap.data {
+		fmt.Printf("key %d\tval %d\n", k, v)
+	}
+	fmt.Println("\nsize of map", len(dataMap.data))
 }

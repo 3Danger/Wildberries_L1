@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -18,7 +19,10 @@ import (
 func main() {
 	var n int
 	fmt.Println("Enter number of workers")
-	_, _ = fmt.Scan(&n)
+	_, ok := fmt.Scan(&n)
+	if ok != nil || n <= 0 {
+		log.Fatalln("Wrong input")
+	}
 	ch := make(chan int)
 
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -30,15 +34,11 @@ func main() {
 	}()
 
 	for i := 0; i < n; i++ {
-		go Worker(ctx, i, ch)
+		go ReaderWorker(ctx, i, ch)
 	}
-	if n > 0 {
-		WriterFunc(ctx, ch)
-		fmt.Println(">>>>>>>>>>>>>>> SIGINT Handled! >>>>>>>>>>>>>>>")
-	} else {
-		fmt.Println("wrong input")
-	}
+	WriterFunc(ctx, ch)
 	close(ch)
+	fmt.Println(">>> SIGINT Handled! >>>")
 }
 
 func WriterFunc(ctx context.Context, ch chan<- int) {
@@ -52,7 +52,7 @@ func WriterFunc(ctx context.Context, ch chan<- int) {
 	}
 }
 
-func Worker(ctx context.Context, id int, ch <-chan int) {
+func ReaderWorker(ctx context.Context, id int, ch <-chan int) {
 	for {
 		select {
 		case <-ctx.Done():

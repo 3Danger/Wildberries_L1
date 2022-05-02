@@ -15,32 +15,31 @@ import (
 //nums := []int{2,4,6,8,10}
 
 func main() {
-	array := []int{2, 4, 6, 8, 10}
-	SolutionMutex(array)
-	SolutionChannel(array)
-	SolutionWaitGroup(array)
-	SolutionAtomic(array)
+	//arr := []int{2, 4, 6, 8, 10}
+	arr := make([]int, 1000)
+	for i := 0; i < 1000; i++ {
+		arr[i] = i
+	}
+	SolutionMutex(arr)
+	SolutionChannel(arr)
+	SolutionAtomic(arr)
 }
 
 func SolutionMutex(nums []int) {
 	var sum int
 	mut := sync.Mutex{}
-	size := len(nums)
-	waitChan := make(chan struct{})
+	wg := sync.WaitGroup{}
+	wg.Add(len(nums))
 	fmt.Println("SolutionMutex")
 	for _, v := range nums {
 		go func(n int, m *sync.Mutex) {
 			m.Lock()
 			sum += n * n
 			m.Unlock()
-			waitChan <- struct{}{}
+			wg.Done()
 		}(v, &mut)
 	}
-	for size > 0 {
-		<-waitChan
-		size--
-	}
-	close(waitChan)
+	wg.Wait()
 	fmt.Println("sum :=", sum)
 }
 
@@ -59,22 +58,6 @@ func SolutionChannel(array []int) {
 	for v := range ch {
 		sum += v
 	}
-	fmt.Println("sum :=", sum)
-}
-
-func SolutionWaitGroup(array []int) {
-	var sum int
-	wg := new(sync.WaitGroup)
-
-	fmt.Println("SolutionWaitGroup")
-	wg.Add(len(array))
-	for _, v := range array {
-		go func(v int) {
-			defer wg.Done()
-			sum += v * v
-		}(v)
-	}
-	wg.Wait()
 	fmt.Println("sum :=", sum)
 }
 

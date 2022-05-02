@@ -67,7 +67,7 @@ func ExampleWithChannelSignal() {
 	cn := make(chan struct{})
 	sg := make(chan os.Signal)
 	signal.Notify(sg, os.Interrupt)
-	go routineChannel(cn, "5 - WithChannelSignal")
+	go routineChannel(cn, "5 - press CTRL+C to exit")
 	<-sg
 	cn <- struct{}{}
 	fmt.Println("-----Canceled with signal-----")

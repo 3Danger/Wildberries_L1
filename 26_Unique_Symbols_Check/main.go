@@ -21,7 +21,7 @@ func main() {
 	input := "Введите что-ни-будь:"
 	fmt.Println(input)
 	for {
-		_, err := fmt.Scanln(&input)
+		_, err := fmt.Scan(&input)
 		if err != nil {
 			return
 		}
