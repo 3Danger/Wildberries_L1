@@ -8,17 +8,24 @@ import "fmt"
 
 func main() {
 	fmt.Println("Before:")
+	// объект цветной структуры
 	colorRGB := RGB{196, 2, 255}
 	fmt.Printf("colorRGB %+v\n", colorRGB)
 
+	// объект черной белой структуры
 	colorBW := BW{255}
 	fmt.Printf("colorBW  %+v\n", colorBW)
 
-	// Адаптеры в действии
+	/*
+	 Адаптеры в действии!
+	*/
+
 	fmt.Println("\nAfter:")
+	// Конвертируем цветной в черно-белый а помощью адаптера
 	colorBW.SetColor(&RGBtoBWAdapter{&colorRGB})
 	fmt.Printf("colorBW  %+v\n", colorBW)
 
+	// Конвертируем черно-белый в цветную структуру с помощью адаптера
 	colorRGB.SetColorRGB(&BWtoRGBAdapter{&colorBW})
 	fmt.Printf("colorRGB %+v\n", colorRGB)
 }
