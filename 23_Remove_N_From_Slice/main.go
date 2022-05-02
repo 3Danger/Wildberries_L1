@@ -20,8 +20,8 @@ func main() {
 	arr, _ = Remove(arr, 4)
 	fmt.Printf("after Remove:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
 
-	arr, _ = RemoveWithResize(arr, 6)
-	fmt.Printf("after RemoveWithResize:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
+	arr, _ = RemoveAndResize(arr, 6)
+	fmt.Printf("after RemoveAndResize:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
 }
 
 func Remove[T any](arr []T, n int) ([]T, error) {
@@ -34,7 +34,7 @@ func Remove[T any](arr []T, n int) ([]T, error) {
 	return nil, errors.New("index out of range")
 }
 
-func RemoveWithResize[T any](arr []T, n int) ([]T, error) {
+func RemoveAndResize[T any](arr []T, n int) ([]T, error) {
 	arr, ok := Remove(arr, n)
 	if ok != nil {
 		return arr, ok
