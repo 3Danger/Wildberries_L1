@@ -17,13 +17,13 @@ func main() {
 	a, b = b, a
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 
-	// Второй способ
+	// Второй способ, с помощью битовых операций
 	a ^= b
 	b ^= a
 	a ^= b
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 
-	// Третий способ
+	// Третий способ атомик
 	b = atomic.SwapInt64(&a, b)
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 

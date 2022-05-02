@@ -22,9 +22,8 @@ func main() {
 
 		ok = ChangeByte(&data, n)
 		if ok != nil {
-			log.Fatalln(ok)
+			log.Println(ok, "write again")
 		}
-		fmt.Print("value: ", data, "\nbytes: ")
 		PrintBytes(data)
 	}
 }
@@ -38,7 +37,8 @@ func ChangeByte(data *int64, n int8) (ok error) {
 }
 
 func PrintBytes(data int64) {
-	for i := 63; i >= 0; i-- {
+	fmt.Print("value: ", data, "\nbytes: ")
+	for i := 0; i < 64; i++ {
 		if (data & (1 << i)) == 0 {
 			print("0")
 		} else {

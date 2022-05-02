@@ -30,17 +30,25 @@ func Tester(detector func(interface{})) {
 }
 
 func main() {
+	fmt.Println("\treflect.TypeOf(in)")
 	Tester(DetectorTypeOne)
+
+	fmt.Println("\n\treflect.ValueOf(in).Kind()")
 	Tester(DetectorTypeTwo)
-	Tester(DetectorTypeThree)
+
+	/*
+		!!Wrong solution
+		fmt.Println("\n\tfmt.Sprintf()")
+		Tester(DetectorTypeThree)
+	*/
 }
 
 func DetectorTypeOne(in interface{}) {
 	fmt.Println(reflect.TypeOf(in))
 }
 func DetectorTypeTwo(in interface{}) {
-	fmt.Println(fmt.Sprintf("%T", in))
+	fmt.Println(reflect.ValueOf(in).Kind())
 }
 func DetectorTypeThree(in interface{}) {
-	fmt.Println(reflect.ValueOf(in).Kind())
+	fmt.Println(fmt.Sprintf("%T", in))
 }

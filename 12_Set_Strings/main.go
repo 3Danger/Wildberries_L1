@@ -15,13 +15,17 @@ func main() {
 
 // GetSet O(n*2)
 func GetSet(strs *[]string) *[]string {
+	// Бинарное дерево будет быстрее
+	// Для нашей задачи подходит лучше всего
+	// тем самым избежим лишние проходы по слайсу
 	maps := make(map[string]struct{})
-	sets := new([]string)
 	for _, v := range *strs {
 		maps[v] = struct{}{}
 	}
+
+	result := new([]string)
 	for k, _ := range maps {
-		*sets = append(*sets, k)
+		*result = append(*result, k)
 	}
-	return sets
+	return result
 }

@@ -17,7 +17,7 @@ type CounterStruct struct {
 	Count int
 }
 
-func (c *CounterStruct) Increment() {
+func (c *CounterStruct) IncrementSync() {
 	c.Lock()
 	// Критическая секция к которой
 	// доступ в один момент времени
@@ -28,7 +28,7 @@ func (c *CounterStruct) Increment() {
 
 func GoroutineOne(counterStruct *CounterStruct) {
 	// Инкрементируем
-	counterStruct.Increment()
+	counterStruct.IncrementSync()
 	// Отмечаемся что завершили работу
 	counterStruct.Done()
 }

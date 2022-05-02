@@ -20,7 +20,7 @@ func main() {
 	} // Отсортированный массив от -50 до +50
 
 	// Ищем под каким индексом находится значение `33` в массиве
-	index, err := FindIndex(arr, -49)
+	index, err := FindIndex(arr, 33)
 	if err != nil {
 		fmt.Println(err)
 	} else {
