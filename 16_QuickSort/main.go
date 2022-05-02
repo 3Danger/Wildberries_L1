@@ -25,7 +25,7 @@ func QuickSort(arr []int) {
 	left := 0
 	// Все что меньше pivot будем класть в left
 	// и переходить к следующему индексу, и так не доходя до pivot
-	for i, _ := range arr[:pivot] {
+	for i, _ := range arr {
 		if arr[i] < arr[pivot] {
 			arr[left], arr[i] = arr[i], arr[left]
 			left++
