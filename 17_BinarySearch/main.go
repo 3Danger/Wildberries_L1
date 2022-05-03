@@ -30,18 +30,18 @@ func main() {
 }
 
 func FindIndex(arr []int, value int) (index int, ok error) {
-	if len(arr) < 1 {
+	if len(arr) < 1 { // если слайс пустой, значит не нашли ничего
 		return -1, errors.New("not found")
 	}
-	index = len(arr) >> 1
-	if arr[index] > value {
+	index = len(arr) >> 1   // Обращаемся к индексу в середине слайса
+	if arr[index] > value { // если значение больше элемента посередине, то ищем в правой половине слайса, рекурсивно
 		return FindIndex(arr[:index], value)
-	} else if arr[index] < value {
+	} else if arr[index] < value { // иначе если значение меньше значения посередине то ищем в левой половине слайса, рекурсивно
 		findIndex, err := FindIndex(arr[index+1:], value)
 		if err != nil {
 			return -1, err
 		}
 		return index + findIndex + 1, nil
 	}
-	return index, nil
+	return index, nil // Иначе мы нашли значение
 }
