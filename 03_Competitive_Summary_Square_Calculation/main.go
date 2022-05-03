@@ -48,12 +48,19 @@ func SolutionChannel(array []int) {
 	ch := make(chan int)
 	fmt.Println("SolutionChannel")
 
-	go func(ar []int) {
-		defer close(ch)
-		for _, v := range ar {
-			ch <- v * v
-		}
-	}(array)
+	wg := sync.WaitGroup{}
+	wg.Add(len(array))
+	for i := 0; i < len(array); i++ {
+		go func(v int, w *sync.WaitGroup, c chan<- int) {
+			c <- v * v
+			wg.Done()
+		}(array[i], &wg, ch)
+	}
+
+	go func(w *sync.WaitGroup, c chan int) {
+		w.Wait()
+		close(c)
+	}(&wg, ch)
 
 	for v := range ch {
 		sum += v
