@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 )
 
@@ -13,64 +13,83 @@ import (
 	Реализовать все возможные способы остановки выполнения горутины.
 */
 
-func routineContext(ctx context.Context, msg string) {
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			fmt.Println(msg, rand.Int())
-		}
-	}
+func routineContext(ctx context.Context, wg *sync.WaitGroup, msg string) {
+	defer wg.Done()
+	//for {
+	//	select {
+	/*	case*/
+	<-ctx.Done() //:
+	//		return
+	//	default:
+	fmt.Println("\rClosed", msg)
+	//}
+	//}
 }
 
-func routineChannel(s <-chan struct{}, msg string) {
-	for {
-		select {
-		case <-s:
-			return
-		default:
-			fmt.Println(msg, rand.Int())
-		}
-	}
+func routineChannel(s <-chan struct{}, wg *sync.WaitGroup, msg string) {
+	defer wg.Done()
+	//for {
+	//	select {
+	/*	case */
+	<-s //:
+	//		return
+	//	default:
+	fmt.Println("\rClosed", msg)
+	//}
+	//}
 }
 
 func ExampleWithCancel() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	go routineContext(ctx, "1 - WithCancel")
+	go routineContext(ctx, &wg, "1 - WithCancel")
 	time.Sleep(time.Second)
 	cancelFunc()
+	wg.Wait()
 }
 
 func ExampleWithTimeout() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	ctxTime, cancelFuncTime := context.WithTimeout(context.Background(), time.Second)
 	defer cancelFuncTime()
-	go routineContext(ctxTime, "2 - WithTimeout")
+	go routineContext(ctxTime, &wg, "2 - WithTimeout")
 	<-ctxTime.Done()
+	wg.Wait()
 }
 
 func ExampleWithDeadline() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	deadline, cancelFunc := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
 	defer cancelFunc()
-	go routineContext(deadline, "3 - WithDeadline")
+	go routineContext(deadline, &wg, "3 - WithDeadline")
 	<-deadline.Done()
+	wg.Wait()
 }
 
 func ExampleWithChannel() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	cn := make(chan struct{})
-	go routineChannel(cn, "4 - WithChannel")
+	go routineChannel(cn, &wg, "4 - WithChannel")
 	time.Sleep(time.Second)
 	cn <- struct{}{}
+	wg.Wait()
 }
 
 func ExampleWithChannelSignal() {
+	fmt.Println("press CTRL+C to close last goroutine")
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	cn := make(chan struct{})
 	sg := make(chan os.Signal)
 	signal.Notify(sg, os.Interrupt)
-	go routineChannel(cn, "5 - press CTRL+C to exit")
+	go routineChannel(cn, &wg, "5 with signal CTRL+C - WithChannelSignal")
 	<-sg
 	cn <- struct{}{}
-	fmt.Println("-----Canceled with signal-----")
+	wg.Wait()
 }
 
 func main() {

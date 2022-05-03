@@ -18,7 +18,7 @@ func main() {
 	// Инициализируем слайс
 	temperatures := []float64{-25.4, -15, -16.6, -19, -20, -27.0, 13.0, 19.0, 15.5, 24.5, -21.0, 32.5}
 	// Получаем подмножество
-	subsets := GetSubsets(&temperatures)
+	subsets := GetSubsets(temperatures)
 	// Выводим в консоль наше подмножество
 	PrintMap(subsets)
 }
@@ -33,13 +33,13 @@ func GetThreshold(f float64) int {
 }
 
 // GetSubsets Получаем подмножество
-func GetSubsets(temp *[]float64) *map[int][]float64 {
+func GetSubsets(temp []float64) map[int][]float64 {
 	// Сортируем
-	sort.Float64s(*temp)
+	sort.Float64s(temp)
 	// Получаем минимальный порог
-	min := GetThreshold((*temp)[0])
+	min := GetThreshold(temp[0])
 	result := make(map[int][]float64)
-	for _, t := range *temp {
+	for _, t := range temp {
 		if (min + 10) <= int(t) {
 			// Обновляем порог
 			min = GetThreshold(t)
@@ -47,12 +47,12 @@ func GetSubsets(temp *[]float64) *map[int][]float64 {
 		// Добавляем значение в слайс который находится в диапазоне этого порога
 		result[min] = append(result[min], t)
 	}
-	return &result
+	return result
 }
 
 // PrintMap Выводим в консоль наше подмножество
-func PrintMap(subsets *map[int][]float64) {
-	for key, values := range *subsets {
+func PrintMap(subsets map[int][]float64) {
+	for key, values := range subsets {
 		fmt.Printf("key %d: {\n", key)
 		for _, v := range values {
 			fmt.Printf("\tvalues %.1f\n", v)
