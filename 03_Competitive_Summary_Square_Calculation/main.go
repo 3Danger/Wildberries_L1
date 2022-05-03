@@ -44,28 +44,22 @@ func SolutionMutex(nums []int) {
 }
 
 func SolutionChannel(array []int) {
-	var sum int
-	ch := make(chan int)
+	//var sum int
+	ch := make(chan int, 1)
 	fmt.Println("SolutionChannel")
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(array))
+	ch <- 0
 	for _, value := range array {
-		go func(v int, w *sync.WaitGroup, c chan<- int) {
-			c <- v * v
+		go func(v int, w *sync.WaitGroup, c chan int) {
+			c <- (v * v) + <-c
 			wg.Done()
 		}(value, &wg, ch)
 	}
-
-	go func(w *sync.WaitGroup, c chan int) {
-		w.Wait()
-		close(c)
-	}(&wg, ch)
-
-	for v := range ch {
-		sum += v
-	}
-	fmt.Println("sum :=", sum)
+	wg.Wait()
+	close(ch)
+	fmt.Println("sum :=", <-ch)
 }
 
 func SolutionAtomic(array []int) {
