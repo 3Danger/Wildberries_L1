@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -28,31 +29,28 @@ func main() {
 
 	ctxTimeout, cancelFuncTm := context.WithTimeout(context.Background(), tm)
 	defer cancelFuncTm()
-	ctxClosable, cancelFunc := context.WithCancel(context.Background())
-	defer cancelFunc()
+
+	m := sync.Mutex{}
+	m.Lock()
 
 	ch := make(chan int)
-	go Receiver(ctxClosable, ch)
-	Sender(ctxTimeout, cancelFunc, ch)
+	go Receiver(&m, ch)
+	Sender(ctxTimeout, ch)
+	m.Lock()
 	fmt.Println("Time expired", tm)
 }
 
-func Receiver(ctx context.Context, data <-chan int) {
-	for {
-		select {
-		case d := <-data:
-			fmt.Println(d)
-		case <-ctx.Done():
-			return
-		}
+func Receiver(m *sync.Mutex, data <-chan int) {
+	defer m.Unlock()
+	for d := range data {
+		fmt.Println(d)
 	}
 }
 
-func Sender(ctx context.Context, cancelFunc context.CancelFunc, data chan<- int) {
+func Sender(ctx context.Context, data chan<- int) {
 	for {
 		select {
 		case <-ctx.Done():
-			cancelFunc()
 			close(data)
 			return
 		default:
