@@ -15,7 +15,7 @@ import (
 */
 
 func InputScanTime() (tm time.Duration) {
-	fmt.Println("Enter num deadline second")
+	fmt.Println("Enter num of second for deadline")
 	scan, err := fmt.Scan(&tm)
 	if err != nil || scan <= 0 || tm <= 0 {
 		log.Fatalln("Wrong argument")
