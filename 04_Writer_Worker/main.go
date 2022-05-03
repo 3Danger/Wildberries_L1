@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
+	"sync"
 )
 
 /*
@@ -17,14 +18,15 @@ import (
 */
 
 func main() {
-	var n int
+	var nWorker int
+	wg := sync.WaitGroup{}
 	fmt.Println("Enter number of workers")
-	_, ok := fmt.Scan(&n)
-	if ok != nil || n <= 0 {
+	_, ok := fmt.Scan(&nWorker)
+	if ok != nil || nWorker <= 0 {
 		log.Fatalln("Wrong input")
 	}
+	wg.Add(nWorker)
 	ch := make(chan int)
-
 	ctx, cancelFunc := context.WithCancel(context.Background())
 	sig := make(chan os.Signal)
 	signal.Notify(sig, os.Interrupt)
@@ -33,18 +35,19 @@ func main() {
 		cancelFunc()
 	}()
 
-	for i := 0; i < n; i++ {
-		go ReaderWorker(ctx, i, ch)
+	for i := 0; i < nWorker; i++ {
+		go ReaderWorker(ctx, &wg, i, ch)
 	}
-	WriterFunc(ctx, ch)
-	close(ch)
+	WriterFunc(ctx, &wg, ch)
 	fmt.Println(">>> SIGINT Handled! >>>")
 }
 
-func WriterFunc(ctx context.Context, ch chan<- int) {
+func WriterFunc(ctx context.Context, wg *sync.WaitGroup, ch chan<- int) {
 	for {
 		select {
 		case <-ctx.Done():
+			wg.Wait()
+			close(ch)
 			return
 		default:
 			ch <- rand.Int()
@@ -52,10 +55,11 @@ func WriterFunc(ctx context.Context, ch chan<- int) {
 	}
 }
 
-func ReaderWorker(ctx context.Context, id int, ch <-chan int) {
+func ReaderWorker(ctx context.Context, wg *sync.WaitGroup, id int, ch <-chan int) {
 	for {
 		select {
 		case <-ctx.Done():
+			wg.Done()
 			return
 		case v := <-ch:
 			fmt.Println("id:", id, " Data:", v)
