@@ -15,15 +15,19 @@ func main() {
 	var data int64
 	fmt.Println("Enter N of byte: [1..64]")
 	for {
+		//Получаем значение с консоли
 		_, ok := fmt.Scan(&n)
 		if ok != nil {
 			log.Fatalln(ok)
 		}
 
+		//Меняем бит в соответствии i-й
 		ok = ChangeByte(&data, n)
 		if ok != nil {
 			log.Println(ok, "write again")
 		}
+
+		//Отображаем результат
 		PrintBytes(data)
 	}
 }
