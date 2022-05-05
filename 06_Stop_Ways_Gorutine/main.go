@@ -15,27 +15,29 @@ import (
 
 func routineContext(ctx context.Context, wg *sync.WaitGroup, msg string) {
 	defer wg.Done()
+	<-ctx.Done()
+	fmt.Println("\rClosed", msg)
 	//for {
 	//	select {
-	/*	case*/
-	<-ctx.Done() //:
+	/*	case <-ctx.Done():*/
 	//		return
 	//	default:
-	fmt.Println("\rClosed", msg)
-	//}
+	//	........
+	//	}
 	//}
 }
 
 func routineChannel(s <-chan struct{}, wg *sync.WaitGroup, msg string) {
 	defer wg.Done()
+	<-s
+	fmt.Println("\rClosed", msg)
 	//for {
 	//	select {
-	/*	case */
-	<-s //:
+	/*	case <-s: */
 	//		return
 	//	default:
-	fmt.Println("\rClosed", msg)
-	//}
+	//	........
+	//	}
 	//}
 }
 
