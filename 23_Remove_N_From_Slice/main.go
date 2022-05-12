@@ -10,28 +10,42 @@ import (
 */
 
 func main() {
-	arr := make([]int, 20, 30)
-	for i := 0; i < 20; i++ {
+	arr := make([]int, 10, 30)
+	for i := range arr {
 		arr[i] = i
 	}
 
-	fmt.Printf("before:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
+	fmt.Printf("len: %d, cap: %d - %v До изменений\n\n", len(arr), cap(arr), arr)
+
+	arr, _ = RemoveWithPreservationOrder(arr, 7)
+	fmt.Printf("len: %d, cap: %d - %v\tУдалени с сохранением порядка\n", len(arr), cap(arr), arr)
 
 	arr, _ = Remove(arr, 4)
-	fmt.Printf("after Remove:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
+	fmt.Printf("len: %d, cap: %d - %v\tБыстрое удаление c нарушением порядка\n", len(arr), cap(arr), arr)
 
-	arr, _ = RemoveAndResize(arr, 6)
-	fmt.Printf("after RemoveAndResize:\nlen: %d, cap: %d - %v\n\n", len(arr), cap(arr), arr)
+	arr, _ = RemoveAndResize(arr, 2)
+	fmt.Printf("len: %d, cap: %d - %v\tУдаление и подгонка capacity\n", len(arr), cap(arr), arr)
+
+	fmt.Printf("\nlen: %d, cap: %d - %v\tПосле изменений\n\n", len(arr), cap(arr), arr)
 }
 
 func Remove[T any](arr []T, n int) ([]T, error) {
 	l := len(arr) - 1
-	if n < l && n >= 0 {
-		return append(arr[:n], arr[n+1:]...), nil
+	if n > l && n <= 0 || arr == nil {
+		return nil, errors.New("index out of range")
+	}
+	arr[n], arr[len(arr)-1] = arr[len(arr)-1], arr[n]
+	return arr[:len(arr)-1], nil
+}
+
+func RemoveWithPreservationOrder[T any](arr []T, n int) ([]T, error) {
+	l := len(arr) - 1
+	if n > l && n <= 0 || arr == nil {
+		return nil, errors.New("index out of range")
 	} else if n == l {
 		return arr[:n], nil
 	}
-	return nil, errors.New("index out of range")
+	return append(arr[:n], arr[n+1:]...), nil
 }
 
 func RemoveAndResize[T any](arr []T, n int) ([]T, error) {

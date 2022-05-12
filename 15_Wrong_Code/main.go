@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
+	"unsafe"
 )
 
 /*
@@ -27,12 +29,22 @@ func mainExample() {
 	и будут висеть в памяти, сборщик мусора удалит это лишь тогда - когда justString тоже выйдет из области видимости.
 */
 
+/*
+	Мы сожем проверить это с помощью пакета reflect,
+	что бы убедиться в каких случаях передается тот же самый указатель на байты,
+	что может вызвать проблему в виде не используемого мусора, который висит в памяти.
+*/
+
 func main() {
 	var justString string
 
 	v := createHugeString(1 << 10)
+	fmt.Println(unsafe.Pointer((*(*reflect.StringHeader)(unsafe.Pointer(&v))).Data))
+
 	// Решение: клонировать
 	justString = strings.Clone(v[:100])
+	//justString = v[:100]
+	fmt.Println(unsafe.Pointer((*(*reflect.StringHeader)(unsafe.Pointer(&justString))).Data))
 	fmt.Printf(justString)
 }
 
