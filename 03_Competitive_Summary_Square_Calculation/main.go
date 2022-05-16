@@ -16,9 +16,9 @@ import (
 
 func main() {
 	//arr := []int{2, 4, 6, 8, 10}
-	arr := make([]int, 1000)
-	for i := 0; i < 1000; i++ {
-		arr[i] = i
+	arr := make([]int, 5)
+	for i := 0; i < 5; i++ {
+		arr[i] = (i + 1) << 1
 	}
 	SolutionMutex(arr)
 	SolutionChannel(arr)

@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
 )
 
@@ -18,7 +19,12 @@ func main() {
 		//Получаем значение с консоли
 		_, ok := fmt.Scan(&n)
 		if ok != nil {
-			log.Fatalln(ok)
+			if ok != io.EOF {
+				log.Fatalln(ok)
+			} else {
+				fmt.Println("exit")
+			}
+			return
 		}
 
 		//Меняем бит в соответствии i-й

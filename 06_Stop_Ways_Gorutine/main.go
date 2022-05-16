@@ -71,24 +71,35 @@ func ExampleWithDeadline() {
 	wg.Wait()
 }
 
+func ExampleWithCtxSignal() {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	fmt.Println("\tpress CTRL+C to close NotifyContext goroutine")
+	deadline, cancelFunc := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancelFunc()
+	go routineContext(deadline, &wg, "4 with context signal CTRL+C - NotifyContext")
+	<-deadline.Done()
+	wg.Wait()
+}
+
 func ExampleWithChannel() {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	cn := make(chan struct{})
-	go routineChannel(cn, &wg, "4 - WithChannel")
+	go routineChannel(cn, &wg, "5 - WithChannel")
 	time.Sleep(time.Second)
 	cn <- struct{}{}
 	wg.Wait()
 }
 
 func ExampleWithChannelSignal() {
-	fmt.Println("press CTRL+C to close last goroutine")
+	fmt.Println("\tpress CTRL+C to close last goroutine")
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	cn := make(chan struct{})
 	sg := make(chan os.Signal)
 	signal.Notify(sg, os.Interrupt)
-	go routineChannel(cn, &wg, "5 with signal CTRL+C - WithChannelSignal")
+	go routineChannel(cn, &wg, "6 with signal CTRL+C - WithChannelSignal")
 	<-sg
 	cn <- struct{}{}
 	wg.Wait()
@@ -101,6 +112,8 @@ func main() {
 	ExampleWithTimeout()
 	// Тоже самое что и выше - но работать будет до наступления времени дедлайна
 	ExampleWithDeadline()
+	// Тоже контекст, но привязанный к сигналам, а данном случае (ctrl + c)
+	ExampleWithCtxSignal()
 	// Альтернативные способы с помощью каналов ...
 	ExampleWithChannel()
 	// и сигналов с каналами

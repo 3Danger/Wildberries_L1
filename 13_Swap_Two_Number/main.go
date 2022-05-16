@@ -13,17 +13,17 @@ func main() {
 	var a, b int64 = 999, 121
 	fmt.Printf("before: a = %d, b = %d\n", a, b)
 
-	// <-- Первый способ -->
+	// <-- 1. Первый способ -->
 	a, b = b, a
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 
-	// <-- Второй способ, с помощью битовых операций -->
+	// <-- 2. Второй способ, с помощью битовых операций -->
 	a ^= b
 	b ^= a
 	a ^= b
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 
-	// <-- Третий способ атомик -->
+	// <-- 3. Третий способ атомик -->
 	b = atomic.SwapInt64(&a, b)
 	fmt.Printf("after:  a = %d, b = %d\n", a, b)
 
