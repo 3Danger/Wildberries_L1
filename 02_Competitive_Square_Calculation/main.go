@@ -47,19 +47,26 @@ func SolutionMutexWG(nums []int) {
 
 func SolutionChannel(array []int) {
 	ch := make(chan int, 0)
+	wg := sync.WaitGroup{}
 	fmt.Println("SolutionChannel")
 
 	// Вычисление и запись
+	wg.Add(len(array))
 	for _, v := range array {
-		go func(c chan<- int, v int) {
+		go func(wg *sync.WaitGroup, c chan<- int, v int) {
 			// Каналы потоко-безопасны
 			c <- v * v
-		}(ch, v)
+			wg.Done()
+		}(&wg, ch, v)
 	}
+	// Закрываем канал по завершению всех писателей
+	go func(wg *sync.WaitGroup) {
+		wg.Wait()
+		close(ch)
+	}(&wg)
 
-	// Чтение из канала результатов
-	for i := 0; i < len(array); i++ {
-		fmt.Printf("%d\n", <-ch)
+	// Чтение из канала результатов пока канал открыт
+	for v := range ch {
+		fmt.Printf("%d\n", v)
 	}
-	close(ch)
 }
