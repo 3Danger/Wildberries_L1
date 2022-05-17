@@ -46,9 +46,6 @@ func SolutionMutexWG(nums []int) {
 }
 
 func SolutionChannel(array []int) {
-	// Чем меньше значение буфера,
-	// тем сильнее будет конкуренция
-	// у пишущих в этот канал горутин
 	ch := make(chan int, 0)
 	fmt.Println("SolutionChannel")
 
